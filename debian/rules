@@ -1,0 +1,100 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/utils.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+#### config start ####
+
+NODEJS_MAJOR      = 7
+NODEJS_MINOR      = 9
+NODEJS_VERSION    = $(NODEJS_MAJOR).$(NODEJS_MINOR)
+NODEJS_PREFIX     = /usr/lib/nodejs/nodejs-$(NODEJS_VERSION)
+
+NODEJS_TMPDIR     = debian/tmp/$(NODEJS_PREFIX)
+
+
+DEB_DH_GENCONTROL_ARGS_ALL += -- -Vnodejs:version="$(NODEJS_VERSION)"
+
+DEB_CONFIGURE_NORMAL_ARGS =
+
+# currently unsupported - requires openssl-1.0.2, which hasn't been packaged yet
+# DEB_CONFIGURE_EXTRA_FLAGS += --shared-openssl
+# recent OpenSSL needed because... FIXME (git commit c232e17)
+#
+# ssl-minver = 1.0.0g
+# deps_openssl =, openssl (>= $(ssl-minver))
+# deps_libssl  =, libssl-dev (>= $(ssl-minver))
+
+# currently unsupported - need to upgrade V8 first
+# DEB_CONFIGURE_EXTRA_FLAGS += --shared-v8
+# deps_libv8 =, libv8-3.14-dev (>= 3.7)
+
+# currently unsupported - need to upgrade cares first
+# DEB_CONFIGURE_EXTRA_FLAGS += --shared-cares
+# deps_libares =, libc-ares-dev (>= 1.7.5)
+
+# we're installing major versions into separate prefixes
+# TODO: add update-alternatives(1) support
+DEB_CONFIGURE_EXTRA_FLAGS += --prefix=$(NODEJS_PREFIX)
+
+# dont install bundled NPM - it's a separated package
+DEB_CONFIGURE_EXTRA_FLAGS += --without-npm
+
+# use system zlib
+# already patched-away
+# DEB_CONFIGURE_EXTRA_FLAGS += --shared-zlib
+
+#### config end ####
+
+# suppress checking binary files, to not upset dpkg-source
+DEB_COPYRIGHT_CHECK_IGNORE_REGEX = ^(doc/trademark-policy\.pdf|doc/mac_osx_nodejs_installer_logo\.png|doc/.*-white-stripe\.jpg|favicon\.ico|deps/v8/benchmarks/v8-logo\.png|test/fixtures/person\.jpg.*|src/res/node\.ico|debian/(changelog|copyright(|_hints|_newhints)))$
+
+# Needed by upstream build
+#  * recent gyp needed to build using flock
+bdeps += binutils, pkg-config
+bdeps +=, libkvm-dev [kfreebsd-any], gyp (>= 0.1~svn1654)
+bdeps +=, bash-completion, curl, procps, zlib1g-dev
+bdeps += $(deps_openssl)
+
+deps = python, ca-certificates $(deps_libssl) $(deps_libv8) $(deps_libares)
+
+CDBS_BUILD_DEPENDS +=, $(bdeps), $(deps)
+CDBS_DEPENDS_nodejs-dev = $(deps)
+
+DEB_DESTDIR = $(CURDIR)/debian/tmp
+DEB_MAKE_CLEAN_TARGET = clean
+#  * relax regression tests when targeted experimental suite
+exp-relax-check := $(if $(shell dpkg-parsechangelog | grep -x 'Distribution: \(experimental\|UNRELEASED\)'),-i)
+# DEB_MAKE_CHECK_TARGET = $(exp-relax-check) test-simple test-message
+
+ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
+DEB_CONFIGURE_EXTRA_FLAGS += --dest-os=kfreebsd
+endif
+
+# hardening gyp
+CXXFLAGS+=$(CPPFLAGS)
+export CXXFLAGS
+export LDFLAGS
+
+# properly clean files from build, test, python
+clean::
+	rm -f config.gypi
+	rm -f config.mk
+	rm -f test/fixtures/hello.txt
+	rm -rf test/tmp
+	find . -name "*.pyc" -delete
+	rm -rf out
+
+# rename node executable to nodejs
+# FIXME: still needed at all ?
+#binary-post-install/nodejs::
+#	mv $(NODEJS_TMPDIR)/bin/node $(NODEJS_TMPDIR)/bin/nodejs
+#	mv $(NODEJS_TMPDIR)/share/man/man1/node.1 $(NODEJS_TMPDIR)/share/man/man1/nodejs.1
+
+# remove *.json files from documentation
+# remove all <script> tags from html files, js files are not installed anyway
+# TODO: when doc will be generated from markdown, patch doc/template.html instead
+binary-install/nodejs::
+	find $(NODEJS_TMPDIR)/share/doc/node -name *.json -delete
+#	sed -i -n '1h; 1!H; $${g; s/<script[^><]*>[^><]*<.script[^><]*>//g; p;}' $(NODEJS_TMPDIR)/share/doc/node/api/*.html

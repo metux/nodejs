@@ -1,0 +1,28 @@
+#!/bin/sh
+
+## FIXME: derive that from package name
+NODEJS_VERSION="7.9"
+NODEJS_V_PREFIX=/usr/lib/nodejs/nodejs-$NODEJS_VERSION
+NODEJS_V_CMD=$NODEJS_V_PREFIX/bin/node
+NODEJS_V_MAN=$NODEJS_V_PREFIX/share/man/man1/node.1.gz
+
+PRIORITY=250
+
+set -e
+
+if [ "$1" = "configure" ]; then
+    # remove old link to legacy command name
+    if dpkg --compare-versions "$2" le 0.6.19~dfsg1-2; then
+        update-alternatives --remove js /usr/bin/node
+    fi
+
+    # alternative for js command
+    update-alternatives \
+        --install /usr/bin/js                     js          $NODEJS_V_CMD $PRIORITY \
+        --slave   /usr/share/man/man1/js.1.gz     js.1.gz     $NODEJS_V_MAN
+
+    # alternative for nodejs command
+    update-alternatives \
+        --install /usr/bin/nodejs                 nodejs      $NODEJS_V_CMD $PRIORITY \
+        --slave   /usr/share/man/man1/nodejs.1.gz nodejs.1.gz $NODEJS_V_MAN
+fi

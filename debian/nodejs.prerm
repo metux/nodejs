@@ -1,0 +1,13 @@
+#!/bin/sh
+
+## FIXME: derive that from package name
+NODEJS_VERSION="7.9"
+NODEJS_V_PREFIX=/usr/lib/nodejs/nodejs-$NODEJS_VERSION
+NODEJS_V_CMD=$NODEJS_V_PREFIX/bin/node
+
+set -e
+
+if [ "$1" = "remove" ]; then
+    update-alternatives --remove js     $NODEJS_V_CMD
+    update-alternatives --remove nodejs $NODEJS_V_CMD
+fi
