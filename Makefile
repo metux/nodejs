@@ -667,7 +667,6 @@ $(TARBALL): release-only $(NODE_EXE) doc
 	$(RM) -r $(TARNAME)/doc/images # too big
 	$(RM) -r $(TARNAME)/deps/uv/{docs,samples,test}
 	$(RM) -r $(TARNAME)/deps/openssl/openssl/{doc,demos,test}
-	$(RM) -r $(TARNAME)/deps/zlib/contrib # too big, unused
 	$(RM) -r $(TARNAME)/.{editorconfig,git*,mailmap}
 	$(RM) -r $(TARNAME)/tools/{eslint,eslint-rules,osx-pkg.pmdoc,pkgsrc}
 	$(RM) -r $(TARNAME)/tools/{osx-*,license-builder.sh,cpplint.py}

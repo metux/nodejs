@@ -11,7 +11,6 @@
     'node_shared%': 'false',
     'force_dynamic_crt%': 0,
     'node_module_version%': '',
-    'node_shared_zlib%': 'false',
     'node_shared_http_parser%': 'false',
     'node_shared_cares%': 'false',
     'node_shared_libuv%': 'false',
@@ -150,6 +149,10 @@
         'tools/msvs/genfiles',
         'deps/uv/src/ares',
         '<(SHARED_INTERMEDIATE_DIR)',
+      ],
+
+      'libraries': [
+        '-lz',
       ],
 
       'sources': [
@@ -500,9 +503,6 @@
               },
             }],
           ],
-        }],
-        [ 'node_shared_zlib=="false"', {
-          'dependencies': [ 'deps/zlib/zlib.gyp:zlib' ],
         }],
 
         [ 'node_shared_http_parser=="false"', {
@@ -928,11 +928,6 @@
             'test/cctest/test_inspector_socket_server.cc'
           ],
           'conditions': [
-            [ 'node_shared_zlib=="false"', {
-              'dependencies': [
-                'deps/zlib/zlib.gyp:zlib',
-              ]
-            }],
             [ 'node_shared_openssl=="false"', {
               'dependencies': [
                 'deps/openssl/openssl.gyp:openssl'

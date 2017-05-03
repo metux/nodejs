@@ -70,6 +70,7 @@
   },
 
   'target_defaults': {
+    'libraries': [ '-lz' ],
     'default_configuration': 'Release',
     'configurations': {
       'Debug': {

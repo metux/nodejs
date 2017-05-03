@@ -173,12 +173,6 @@ def headers(action):
     subdir_files('deps/openssl/config/archs', 'include/node/openssl/archs', action)
     action(['deps/openssl/config/opensslconf.h'], 'include/node/openssl/')
 
-  if 'false' == variables.get('node_shared_zlib'):
-    action([
-      'deps/zlib/zconf.h',
-      'deps/zlib/zlib.h',
-    ], 'include/node/')
-
 def run(args):
   global node_prefix, install_path, target_defaults, variables
 
