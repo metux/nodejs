@@ -1,4 +1,4 @@
-.TH NODE 1 2016 Node.js Node.js
+.TH NODEJS 1 2016 Node.js Node.js
 
 .\" This is a man page comment.
 
@@ -26,12 +26,12 @@
 
 .SH NAME
 
-node \- Server-side JavaScript runtime
+nodejs \- Server-side JavaScript runtime
 
 
 .SH SYNOPSIS
 
-.B node
+.B nodejs
 .RI [ options ]
 .RI [ v8\ options ]
 .RI [ script.js \ |
@@ -40,14 +40,14 @@ node \- Server-side JavaScript runtime
 .B [--]
 .RI [ arguments ]
 .br
-.B node debug
+.B nodejs debug
 .RI [ script.js " | "
 .B \-e
 .RI \&" script \&"\ |
 .IR <host>:<port> ]
 .I ...
 .br
-.B node
+.B nodejs
 .RB [ \-\-v8-options ]
 
 Execute without arguments to start the REPL.
@@ -64,11 +64,11 @@ network clients and servers.
 
 .TP
 .BR \-v ", " \-\-version
-Print node's version.
+Print nodejs' version.
 
 .TP
 .BR \-h ", " \-\-help
-Print node command line options.
+Print nodejs command line options.
 The output of this option is less detailed than this document.
 
 .TP
@@ -90,7 +90,7 @@ Open the REPL even if stdin does not appear to be a terminal.
 .TP
 .BR \-r ", " \-\-require " " \fImodule\fR
 Preload the specified module at startup. Follows `require()`'s module resolution
-rules. \fImodule\fR may be either a path to a file, or a node module name.
+rules. \fImodule\fR may be either a path to a file, or a nodejs module name.
 
 .TP
 .BR \-\-inspect \fI[=[host:]port]\fR
@@ -205,7 +205,7 @@ Specify ICU data load path. (overrides \fBNODE_ICU_DATA\fR)
 
 .TP
 .BR \-\-\fR
-Indicate the end of node options. Pass the rest of the arguments to the script.
+Indicate the end of nodejs options. Pass the rest of the arguments to the script.
 
 If no script filename or eval/print script is supplied prior to this, then
 the next argument will be used as a script filename.
